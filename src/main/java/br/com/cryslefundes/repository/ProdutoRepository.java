@@ -3,7 +3,7 @@ package main.java.br.com.cryslefundes.repository;
 import main.java.br.com.cryslefundes.domain.Produto;
 import main.java.br.com.cryslefundes.repository.generic.GenericRepository;
 
-public class ProdutoRepository extends GenericRepository<Produto, String> implements IProdutoRepository {
+public class ProdutoRepository extends GenericRepository<Produto, Long> implements IProdutoRepository {
 
     public ProdutoRepository() {
         super();

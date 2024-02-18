@@ -22,7 +22,7 @@ public class ProdutoRepositoryTest {
     @Before
     public void init() {
         produto = new Produto();
-        produto.setCodigo("A1B2C3");
+        produto.setCodigo(418263L);
         produto.setNome("Produto 1");
         produto.setDescricao("Produto 1");
         produto.setValor(BigDecimal.TEN);

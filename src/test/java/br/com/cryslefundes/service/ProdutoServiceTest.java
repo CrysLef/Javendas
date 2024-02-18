@@ -11,7 +11,6 @@ import org.junit.Test;
 import test.java.br.com.cryslefundes.repository.mock.ProdutoRepositoryMock;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 
 public class ProdutoServiceTest {
     private IProdutoService produtoService;
@@ -25,7 +24,7 @@ public class ProdutoServiceTest {
     @Before
     public void init() {
         produto = new Produto();
-        produto.setCodigo("A1B2C3");
+        produto.setCodigo(418263L);
         produto.setNome("Produto 1");
         produto.setDescricao("Produto 1");
         produto.setValor(BigDecimal.TEN);

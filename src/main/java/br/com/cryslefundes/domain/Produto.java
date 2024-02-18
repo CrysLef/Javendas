@@ -7,16 +7,16 @@ import java.math.BigDecimal;
 
 public class Produto implements Persistente {
     @TipoChave("getCodigo")
-    private String codigo;
+    private Long codigo;
     private String nome;
     private String descricao;
     private BigDecimal valor;
 
-    public String getCodigo() {
+    public Long getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(String codigo) {
+    public void setCodigo(Long codigo) {
         this.codigo = codigo;
     }
 

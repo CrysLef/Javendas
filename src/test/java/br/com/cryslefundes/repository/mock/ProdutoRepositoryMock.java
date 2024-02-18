@@ -13,7 +13,7 @@ public class ProdutoRepositoryMock implements IProdutoRepository {
     }
 
     @Override
-    public void excluir(String valor) {
+    public void excluir(Long valor) {
 
     }
 
@@ -23,7 +23,7 @@ public class ProdutoRepositoryMock implements IProdutoRepository {
     }
 
     @Override
-    public Produto consultar(String valor) {
+    public Produto consultar(Long valor) {
         Produto produto1 = new Produto();
         produto1.setCodigo(valor);
         return produto1;
