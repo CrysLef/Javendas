@@ -4,9 +4,10 @@ import main.java.br.com.cryslefundes.exceptions.TipoChaveNaoEncontradaException;
 import main.java.br.com.cryslefundes.repository.Persistente;
 import main.java.br.com.cryslefundes.repository.generic.IGenericRepository;
 
+import java.io.Serializable;
 import java.util.Collection;
 
-public abstract class GenericService<T extends Persistente, E> implements IGenericService<T, E> {
+public abstract class GenericService<T extends Persistente, E extends Serializable> implements IGenericService<T, E> {
     protected IGenericRepository<T, E> repository;
 
     public GenericService(IGenericRepository<T, E> repository) {

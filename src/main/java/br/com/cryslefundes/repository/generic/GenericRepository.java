@@ -12,7 +12,7 @@ import main.java.annotation.TipoChave;
 import main.java.br.com.cryslefundes.exceptions.TipoChaveNaoEncontradaException;
 import main.java.br.com.cryslefundes.repository.Persistente;
 
-public abstract class GenericRepository<T extends Persistente, E> implements IGenericRepository<T, E> {
+public abstract class GenericRepository<T extends Persistente, E extends Serializable> implements IGenericRepository<T, E> {
     private SingletonMap singletonMap;
     public abstract Class<T> getTipoClasse();
     public abstract void atualizarDados(T entidade, T entidadeCadastrado);
