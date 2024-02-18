@@ -5,7 +5,7 @@ import main.java.br.com.cryslefundes.repository.Persistente;
 
 public class Cliente implements Persistente {
     @TipoChave("getCpf")
-    private String cpf;
+    private Long cpf;
     private String nome;
     private String telefone;
     private String endereco;
@@ -20,11 +20,11 @@ public class Cliente implements Persistente {
         this.nome = nome;
     }
 
-    public String getCpf() {
+    public Long getCpf() {
         return cpf;
     }
 
-    public void setCpf(String cpf) {
+    public void setCpf(Long cpf) {
         this.cpf = cpf;
     }
 

@@ -14,7 +14,7 @@ public class ClienteRepositoryMock implements IClienteRepository {
     }
 
     @Override
-    public void excluir(String valor) {
+    public void excluir(Long valor) {
 
     }
 
@@ -24,7 +24,7 @@ public class ClienteRepositoryMock implements IClienteRepository {
     }
 
     @Override
-    public Cliente consultar(String valor) {
+    public Cliente consultar(Long valor) {
         Cliente cliente = new Cliente();
         cliente.setCpf(valor);
         return cliente;

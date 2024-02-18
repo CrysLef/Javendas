@@ -21,7 +21,7 @@ public class ClienteRepositoryTest {
     @Before
     public void init() {
         cliente = new Cliente();
-        cliente.setCpf("44124124124");
+        cliente.setCpf(44124124124L);
         cliente.setNome("Crystian");
         cliente.setCidade("Rio de janeiro");
         cliente.setEndereco("Rua dos bobos");

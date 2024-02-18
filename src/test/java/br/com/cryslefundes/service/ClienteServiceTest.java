@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import test.java.br.com.cryslefundes.repository.mock.ClienteRepositoryMock;
 
-import java.util.Collection;
 
 public class ClienteServiceTest {
     private IClienteService clienteService;
@@ -24,7 +23,7 @@ public class ClienteServiceTest {
     @Before
     public void init() {
         cliente = new Cliente();
-        cliente.setCpf("44124124124");
+        cliente.setCpf(44124124124L);
         cliente.setNome("Crystian");
         cliente.setCidade("Rio de janeiro");
         cliente.setEndereco("Rua dos bobos");
