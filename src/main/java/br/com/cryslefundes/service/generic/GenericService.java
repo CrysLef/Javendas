@@ -1,6 +1,5 @@
 package main.java.br.com.cryslefundes.service.generic;
 
-import main.java.br.com.cryslefundes.exceptions.TipoChaveNaoEncontradaException;
 import main.java.br.com.cryslefundes.repository.Persistente;
 import main.java.br.com.cryslefundes.repository.generic.IGenericRepository;
 
@@ -15,7 +14,7 @@ public abstract class GenericService<T extends Persistente, E extends Serializab
     }
 
     @Override
-    public Boolean cadastrar(T entidade) throws TipoChaveNaoEncontradaException {
+    public Boolean cadastrar(T entidade) {
         return this.repository.cadastrar(entidade);
     }
 
@@ -25,7 +24,7 @@ public abstract class GenericService<T extends Persistente, E extends Serializab
     }
 
     @Override
-    public void alterar(T entidade) throws TipoChaveNaoEncontradaException {
+    public void alterar(T entidade) {
         this.repository.alterar(entidade);
     }
 
