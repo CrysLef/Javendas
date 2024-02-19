@@ -1,16 +1,37 @@
 package main.java.br.com.cryslefundes.domain;
 
-import main.java.annotation.TipoChave;
+import main.java.annotation.ColunaTabela;
+import main.java.annotation.Tabela;
 import main.java.br.com.cryslefundes.repository.Persistente;
 
+@Tabela("CLIENTES")
 public class Cliente implements Persistente {
-    @TipoChave("getCpf")
+    @ColunaTabela(dbName = "id", setJavaName = "setId")
+    private Long id;
+    @ColunaTabela(dbName = "cpf", setJavaName = "setCpf")
     private Long cpf;
+    @ColunaTabela(dbName = "nome", setJavaName = "setNome")
     private String nome;
+    @ColunaTabela(dbName = "telefone", setJavaName = "setTelefone")
     private String telefone;
+    @ColunaTabela(dbName = "email", setJavaName = "setEmail")
+    private String email;
+    @ColunaTabela(dbName = "endereco", setJavaName = "setEndereco")
     private String endereco;
+    @ColunaTabela(dbName = "cidade", setJavaName = "setCidade")
     private String cidade;
+    @ColunaTabela(dbName = "estado", setJavaName = "setEstado")
     private String estado;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getNome() {
         return nome;
@@ -34,6 +55,14 @@ public class Cliente implements Persistente {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getEndereco() {
