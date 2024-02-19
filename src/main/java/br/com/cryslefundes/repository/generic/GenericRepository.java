@@ -4,99 +4,187 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.*;
 
-import main.java.annotation.TipoChave;
-import main.java.br.com.cryslefundes.exceptions.TipoChaveNaoEncontradaException;
+import main.java.annotation.ColunaTabela;
+import main.java.annotation.Tabela;
+import main.java.br.com.cryslefundes.exceptions.TableException;
 import main.java.br.com.cryslefundes.repository.Persistente;
+import main.java.br.com.cryslefundes.repository.jdbc.ConnectionFactory;
 
 public abstract class GenericRepository<T extends Persistente, E extends Serializable> implements IGenericRepository<T, E> {
-    private SingletonMap singletonMap;
+    private PreparedStatement statement;
+    private ResultSet rset;
     public abstract Class<T> getTipoClasse();
-    public abstract void atualizarDados(T entidade, T entidadeCadastrado);
+    protected abstract String getInsertQuery();
+    protected abstract String getUpdateQuery();
+    protected abstract String getDeleteQuery();
+    protected abstract String getSelectQuery();
+    protected abstract void setInsertQueryParameters(PreparedStatement statement, T entidade) throws SQLException;
+    protected abstract void setUpdateQueryParameters(PreparedStatement statement, T entidade) throws SQLException;
+    protected abstract void setDeleteQueryParameters(PreparedStatement statement, E valor) throws SQLException;
+    protected abstract void setSelectQueryParameters(PreparedStatement statement, E valor) throws SQLException;
 
-    public GenericRepository() {
-        this.singletonMap = SingletonMap.getInstance();
+    public GenericRepository(){}
+
+    private void setValueByType(Class<?> classField, ResultSet rs, String fieldName, Method method, T entidade) throws SQLException, InvocationTargetException, IllegalAccessException {
+        if (classField.equals(Integer.class)) {
+            Integer valor = rs.getInt(fieldName);
+            method.invoke(entidade, valor);
+        } else if (classField.equals(Long.class)) {
+            Long valor = rs.getLong(fieldName);
+            method.invoke(entidade, valor);
+        } else if (classField.equals(BigDecimal.class)) {
+            BigDecimal valor = rs.getBigDecimal(fieldName);
+            method.invoke(entidade, valor);
+        } else if (classField.equals(String.class)) {
+            String valor = rs.getString(fieldName);
+            method.invoke(entidade, valor);
+        }
     }
 
-    public E getChave(T entidade) throws TipoChaveNaoEncontradaException {
-        Field[] fields = entidade.getClass().getDeclaredFields();
-        String msg = "Chave principal do objeto" + entidade.getClass() + " não encontrada";
-        E valorDeRetorno = null;
-
-        for (Field field: fields) {
-            if (field.isAnnotationPresent(TipoChave.class)) {
-                TipoChave tipoChave = field.getAnnotation(TipoChave.class);
-                String nomeMetodo = tipoChave.value();
-
-                try {
-                    Method method = entidade.getClass().getMethod(nomeMetodo);
-                    valorDeRetorno = (E) method.invoke(entidade);
-                    return valorDeRetorno;
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                    throw new TipoChaveNaoEncontradaException(msg, e);
-                }
-            }
+    private String getTableName() throws TableException {
+        if (getTipoClasse().isAnnotationPresent(Tabela.class)) {
+            Tabela tableName = getTipoClasse().getAnnotation(Tabela.class);
+            return tableName.value();
+        } else {
+            throw new TableException("Tabela " + getTipoClasse().getName() + " não encontrada!");
         }
-
-        if (valorDeRetorno == null) {
-            System.out.println("***** ERRO *****" + msg);
-            throw new TipoChaveNaoEncontradaException(msg);
-        }
-        return null;
-    }
-
-    public Map<E, T> getMapa() {
-        Map<E, T> mapaInterno = (Map<E, T>) this.singletonMap.getMap().get(getTipoClasse());
-        if (mapaInterno == null) {
-            mapaInterno = new HashMap<>();
-            this.singletonMap.getMap().put(getTipoClasse(), mapaInterno);
-        }
-        return mapaInterno;
     }
 
     @Override
-    public Boolean cadastrar(T entidade) throws TipoChaveNaoEncontradaException {
-        Map<E, T> mapaInterno = getMapa();
-        E chave = getChave(entidade);
-        if (mapaInterno.containsKey(chave)) {
-            return false;
+    public Boolean cadastrar(T entidade) {
+        Connection database = getConnection();
+        try {
+            statement = database.prepareStatement(getInsertQuery(), Statement.RETURN_GENERATED_KEYS);
+            setInsertQueryParameters(statement, entidade);
+            int rowsAffected = statement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                rset = statement.getGeneratedKeys();
+                if (rset.next()) {
+                    entidade.setId(rset.getLong(1));
+                }
+                return true;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(database, statement, rset);
         }
-        mapaInterno.put(chave, entidade);
-        return true;
+        return false;
     }
 
     @Override
     public void excluir(E valor) {
-        Map<E, T> mapaInterno = getMapa();
-        T objCadastrado = mapaInterno.get(valor);
-        if (objCadastrado != null) {
-            mapaInterno.remove(valor, objCadastrado);
+        Connection database = getConnection();
+        try {
+            statement = database.prepareStatement(getDeleteQuery());
+            setDeleteQueryParameters(statement, valor);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(database, statement, null);
         }
     }
 
     @Override
-    public void alterar(T entidade) throws TipoChaveNaoEncontradaException {
-        Map<E, T> mapaInterno = getMapa();
-        E chave = getChave(entidade);
-        T objCadastrado = mapaInterno.get(chave);
-        if (objCadastrado != null) {
-            atualizarDados(entidade, objCadastrado);
+    public void alterar(T entidade) {
+        Connection database = getConnection();
+        try {
+            statement = database.prepareStatement(getUpdateQuery());
+            setUpdateQueryParameters(statement, entidade);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(database, statement, null);
         }
     }
 
     @Override
     public T consultar(E valor) {
-        Map<E, T> mapaInterno = getMapa();
-        return mapaInterno.get(valor);
+        Connection database = null;
+        try {
+            database = getConnection();
+            statement = database.prepareStatement(getSelectQuery());
+            setSelectQueryParameters(statement, valor);
+            rset = statement.executeQuery();
+
+            if (rset.next()) {
+                T entidade = getTipoClasse().getConstructor().newInstance();
+                Field[] fields = entidade.getClass().getDeclaredFields();
+                for (Field field: fields) {
+                    if (field.isAnnotationPresent(ColunaTabela.class)) {
+                        ColunaTabela coluna = field.getAnnotation(ColunaTabela.class);
+                        String dbName = coluna.dbName();
+                        String setJavaName = coluna.setJavaName();
+                        Class<?> classField = field.getType();
+                        Method method = entidade.getClass().getMethod(setJavaName, classField);
+                        setValueByType(classField, rset, dbName, method, entidade);
+                    }
+                }
+                return entidade;
+            }
+        } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException |
+                 NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(database, statement, rset);
+        }
+        return null;
     }
 
     @Override
     public Collection<T> buscarTodos() {
-        Map<E, T> mapaInterno = getMapa();
-        return mapaInterno.values();
+        List<T> entidades = new ArrayList<>();
+        Connection database = null;
+        try {
+            database = getConnection();
+            statement = database.prepareStatement("SELECT * FROM " + getTableName());
+            rset = statement.executeQuery();
+
+            while (rset.next()) {
+                T entidade = getTipoClasse().getConstructor().newInstance();
+                Field[] fields = entidade.getClass().getDeclaredFields();
+                for (Field field: fields) {
+                    if (field.isAnnotationPresent(ColunaTabela.class)) {
+                        ColunaTabela coluna = field.getAnnotation(ColunaTabela.class);
+                        String dbName = coluna.dbName();
+                        String setJavaName = coluna.setJavaName();
+                        Class<?> classField = field.getType();
+                        Method method = entidade.getClass().getMethod(setJavaName, classField);
+                        setValueByType(classField, rset, dbName, method, entidade);
+                    }
+                }
+                entidades.add(entidade);
+            }
+        } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException |
+                 NoSuchMethodException | TableException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeConnection(database, statement, rset);
+        }
+        return entidades;
+    }
+
+    private static Connection getConnection() {
+        try {
+            return ConnectionFactory.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void closeConnection(Connection connection, PreparedStatement statement, ResultSet rset) {
+        try {
+            ConnectionFactory.closeConnection(connection, statement, rset);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
