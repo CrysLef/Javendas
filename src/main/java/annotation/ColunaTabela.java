@@ -5,6 +5,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TipoChave {
-    String value();
+public @interface ColunaTabela {
+    String dbName();
+    String setJavaName();
 }
