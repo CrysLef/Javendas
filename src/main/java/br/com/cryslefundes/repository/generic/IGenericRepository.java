@@ -6,11 +6,10 @@ import java.io.Serializable;
 import java.util.Collection;
 
 public interface IGenericRepository<T extends Persistente, E extends Serializable> {
-    Boolean cadastrar(T entidade);
-    void excluir(E valor);
-    void alterar(T entidade);
+    T cadastrar(T entidade);
+    void excluir(T entidade);
+    T alterar(T entidade);
     T consultar(E valor);
-
     Collection<T> buscarTodos();
 
 }
