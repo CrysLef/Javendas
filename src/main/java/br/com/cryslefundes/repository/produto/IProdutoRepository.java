@@ -1,4 +1,4 @@
-package main.java.br.com.cryslefundes.repository;
+package main.java.br.com.cryslefundes.repository.produto;
 
 import main.java.br.com.cryslefundes.domain.Produto;
 import main.java.br.com.cryslefundes.repository.generic.IGenericRepository;
