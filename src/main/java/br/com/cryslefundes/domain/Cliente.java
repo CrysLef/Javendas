@@ -1,26 +1,27 @@
 package main.java.br.com.cryslefundes.domain;
 
-import main.java.annotation.ColunaTabela;
-import main.java.annotation.Tabela;
 import main.java.br.com.cryslefundes.repository.Persistente;
 
-@Tabela("CLIENTES")
+import javax.persistence.*;
+
+@Entity
+@Table(name = "CLIENTES")
 public class Cliente implements Persistente {
-    @ColunaTabela(dbName = "id", setJavaName = "setId")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ColunaTabela(dbName = "cpf", setJavaName = "setCpf")
+    @Column(nullable = false, length = 11, unique = true)
     private Long cpf;
-    @ColunaTabela(dbName = "nome", setJavaName = "setNome")
+    @Column(nullable = false)
     private String nome;
-    @ColunaTabela(dbName = "telefone", setJavaName = "setTelefone")
+    @Column(nullable = false)
     private String telefone;
-    @ColunaTabela(dbName = "email", setJavaName = "setEmail")
+    @Column(nullable = false)
     private String email;
-    @ColunaTabela(dbName = "endereco", setJavaName = "setEndereco")
+    @Column(nullable = false)
     private String endereco;
-    @ColunaTabela(dbName = "cidade", setJavaName = "setCidade")
+    @Column(nullable = false)
     private String cidade;
-    @ColunaTabela(dbName = "estado", setJavaName = "setEstado")
+    @Column(nullable = false)
     private String estado;
 
     @Override

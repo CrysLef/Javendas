@@ -1,24 +1,24 @@
 package main.java.br.com.cryslefundes.domain;
 
-import main.java.annotation.ColunaTabela;
-import main.java.annotation.Tabela;
 import main.java.br.com.cryslefundes.repository.Persistente;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 
-@Tabela("PRODUTOS")
+@Entity
+@Table(name = "PRODUTOS")
 public class Produto implements Persistente {
-    @ColunaTabela(dbName = "id", setJavaName = "setId")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ColunaTabela(dbName = "codigo", setJavaName = "setCodigo")
+    @Column(nullable = false, length = 20, unique = true)
     private Long codigo;
-    @ColunaTabela(dbName = "nome", setJavaName = "setNome")
+    @Column(nullable = false)
     private String nome;
-    @ColunaTabela(dbName = "descricao", setJavaName = "setDescricao")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String descricao;
-    @ColunaTabela(dbName = "valor", setJavaName = "setValor")
+    @Column(nullable = false)
     private BigDecimal valor;
-    @ColunaTabela(dbName = "estoque", setJavaName = "setEstoque")
+    @Column(nullable = false)
     private Integer estoque;
 
     @Override
